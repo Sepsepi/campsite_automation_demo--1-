@@ -1,2 +1,4 @@
 playwright==1.41.2
 openpyxl==3.1.2
+tkcalendar
+cx_Freeze
