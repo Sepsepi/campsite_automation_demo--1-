@@ -19,7 +19,8 @@ sys.setrecursionlimit(sys.getrecursionlimit() * 10)
 # This path points to where 'playwright install chromium' downloaded the browser.
 # IMPORTANT: Ensure this path is correct for your system and 'chromium-1097' is the version.
 user_profile = os.environ.get("USERPROFILE", "C:/Users/The Effrontery") # Fallback
-chromium_src_path_str = str(Path(user_profile) / "AppData" / "Local" / "ms-playwright" / "chromium-1097" / "chrome-win")
+# Updated to use chromium-1169 path
+chromium_src_path_str = str(Path(user_profile) / "campsite_automation_demo--1-" / "build" / "exe.win-amd64-3.9" / "lib" / "playwright" / "driver" / "package" / ".local-browsers" / "chromium-1169" / "chrome-win")
 
 # Check if the source path exists
 if not os.path.exists(chromium_src_path_str):
@@ -45,9 +46,9 @@ build_exe_options = {
 
 # Base name for the executable
 # Set base to None for console window (useful for debugging bundled app)
-base = None 
-# if sys.platform == "win32":
-#     base = "Win32GUI" # Re-enable this for final GUI build without console
+base = None
+if sys.platform == "win32":
+    base = "Win32GUI"  # Hide console window for GUI app
 
 setup(
     name="CampsiteChecker",
