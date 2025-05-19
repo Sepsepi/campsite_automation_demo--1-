@@ -18,15 +18,29 @@ sys.setrecursionlimit(sys.getrecursionlimit() * 10)
 # --- Determine Playwright browser source path ---
 # This path points to where 'playwright install chromium' downloaded the browser.
 # IMPORTANT: Ensure this path is correct for your system and 'chromium-1097' is the version.
-user_profile = os.environ.get("USERPROFILE", "C:/Users/The Effrontery") # Fallback
-# Updated to use chromium-1169 path
-chromium_src_path_str = str(Path(user_profile) / "campsite_automation_demo--1-" / "build" / "exe.win-amd64-3.9" / "lib" / "playwright" / "driver" / "package" / ".local-browsers" / "chromium-1169" / "chrome-win")
+user_profile = os.environ.get("USERPROFILE") or os.path.expanduser("~")  # More robust fallback for user profile
+# Updated to use chromium-1005 path
+chromium_src_path_str = str(Path(user_profile) / "AppData" / "Local" / "ms-playwright" / "chromium-1005" / "chrome-win")
 
 # Check if the source path exists
 if not os.path.exists(chromium_src_path_str):
     print(f"ERROR: Chromium source path for bundling not found: {chromium_src_path_str}")
     print("Please ensure Playwright's Chromium browser (version 1097) is installed by running 'playwright install chromium'")
     # Consider sys.exit(1) here if you want the build to fail if browsers aren't pre-installed.
+
+# --- Determine Python installation path for Tcl/Tk ---
+# This is based on the traceback provided in the error.
+python_install_dir_str = r"C:\Users\my notebook\AppData\Local\Programs\Python\Python39" # From error traceback
+tcl_lib_path_str = str(Path(python_install_dir_str) / "tcl" / "tcl8.6")
+tk_lib_path_str = str(Path(python_install_dir_str) / "tcl" / "tk8.6")
+
+# Check if Tcl/Tk paths exist
+if not os.path.exists(tcl_lib_path_str):
+    print(f"ERROR: Tcl library path not found: {tcl_lib_path_str}")
+    # sys.exit(1) # Optionally fail build
+if not os.path.exists(tk_lib_path_str):
+    print(f"ERROR: Tk library path not found: {tk_lib_path_str}")
+    # sys.exit(1) # Optionally fail build
 
 # Dependencies
 build_exe_options = {
@@ -40,7 +54,9 @@ build_exe_options = {
     "excludes": [],
     "include_files": [
         # Copy the entire 'chrome-win' directory to the specific path Playwright expects within the bundle.
-        (chromium_src_path_str, "lib/playwright/driver/package/.local-browsers/chromium-1097/chrome-win")
+        (chromium_src_path_str, "lib/playwright/driver/package/.local-browsers/chromium-1005/chrome-win"),
+        (tcl_lib_path_str, "lib/tcl8.6"), # Added for Tcl
+        (tk_lib_path_str, "lib/tk8.6")    # Added for Tk
     ],
 }
 

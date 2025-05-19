@@ -1,5 +1,25 @@
 import time
 import openpyxl # Changed from pandas
+import os # Make sure os is imported
+import sys # Make sure sys is imported
+
+# --- Determine application path for bundled resources ---
+if getattr(sys, 'frozen', False): # Check if running in a cx_Freeze/PyInstaller bundle
+    # If frozen, the application path is the directory of the executable
+    application_path = os.path.dirname(sys.executable)
+else:
+    # If not frozen, it's the directory of the script file
+    application_path = os.path.dirname(os.path.abspath(__file__))
+
+# --- Crucial for cx_Freeze to find bundled Playwright browsers ---
+# This tells Playwright where to find the browser binaries we've bundled.
+# It MUST be set *before* Playwright is imported or initialized.
+if getattr(sys, 'frozen', False):
+    # Construct the path to the .local-browsers directory within the 'lib' folder of the bundle
+    browsers_path_in_bundle = os.path.join(application_path, 'lib', 'playwright', 'driver', 'package', '.local-browsers')
+    os.environ['PLAYWRIGHT_BROWSERS_PATH'] = browsers_path_in_bundle
+# --- End crucial cx_Freeze Playwright fix ---
+
 from playwright.sync_api import sync_playwright
 from datetime import date, timedelta, datetime
 import tkinter as tk
@@ -65,13 +85,9 @@ EXTRACT_JS = """
 """
 
 def resource_path(relative_path):
-    """Get absolute path to resource, works for dev and for PyInstaller"""
-    try:
-        # PyInstaller creates a temp folder and stores path in _MEIPASS
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path)
+    """Get absolute path to resource, works for dev and for cx_Freeze/PyInstaller"""
+    # Use the application_path determined earlier
+    return os.path.join(application_path, relative_path)
 
 def perform_site_check(start_date_str, end_date_str, log_callback, progress_callback=None, headless=False, park_name=None, site_list=None): # Add headless, park_name, and site_list parameters
     # Use the value from the GUI box directly for park_name and site_list, defaulting only if not provided

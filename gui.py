@@ -1,3 +1,18 @@
+import sys
+import os
+
+if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+    # sys._MEIPASS is the path to the temporary directory where PyInstaller extracted files
+    bundle_dir = sys._MEIPASS
+    
+    # Construct the path to the directory where browser folders (like chromium-1041) are stored.
+    # Our spec file puts the 'chromium-1041' folder into:
+    # lib/playwright/driver/package/.local-browsers/chromium-1041
+    # So, PLAYWRIGHT_BROWSERS_PATH should point to the parent of 'chromium-1041', which is:
+    # lib/playwright/driver/package/.local-browsers
+    browsers_root_inside_bundle = os.path.join(bundle_dir, 'lib', 'playwright', 'driver', 'package', '.local-browsers')
+    os.environ['PLAYWRIGHT_BROWSERS_PATH'] = browsers_root_inside_bundle
+
 import tkinter as tk
 from tkinter import scrolledtext, messagebox
 from tkinter import ttk
